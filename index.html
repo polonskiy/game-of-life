@@ -1,0 +1,84 @@
+<script>
+
+const cellSize = 5;
+const cellsWidth = 150;
+const cellsHeight = 150;
+const probability = 0.5;
+const fps = 10;
+const cellColor = 'green';
+const bgColor = 'black';
+var cells = [];
+
+window.onload = function() {
+    canvas = document.createElement('canvas');
+    canvas.width = cellsWidth * cellSize;
+    canvas.height = cellsHeight * cellSize;
+    document.body.appendChild(canvas);
+    canvasContext = canvas.getContext('2d');
+    generate();
+    setInterval(function() {
+        clearScreen();
+        renderCells();
+        regenerate();
+    }, 1000/fps);
+}
+
+function clearScreen() {
+    canvasContext.fillStyle = bgColor;
+    canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function generate() {
+    cells = [];
+    for(var x = 0; x < cellsWidth; x++) {
+        cells[x] = [];
+        for(var y = 0; y < cellsHeight; y++) {
+            cells[x][y] = Math.random() <= probability;
+        }
+    }
+}
+
+function regenerate() {
+    var newGeneration = [];
+    for(var x = 0; x < cells.length; x++) {
+        newGeneration[x] = [];
+        for(var y = 0; y < cells[x].length; y++) {
+            var neighbours = 0;
+            var isEmpty = !cells[x][y];
+            var npos = [
+                [x-1,y-1],  [x,y-1],    [x+1,y-1],
+                [x-1,y],    /*[x,y],*/  [x+1,y],
+                [x-1,y+1],  [x,y+1],    [x+1,y+1],
+            ];
+            for(var z = 0; z < npos.length; z++) {
+                var xx = npos[z][0];
+                var yy = npos[z][1];
+                if (xx < 0) xx = cells.length + xx;
+                if (yy < 0) yy = cells[x].length + yy;
+                if (xx >= cells.length) xx = xx % cells.length;
+                if (yy >= cells[x].length) yy = yy % cells[x].length;
+                if (cells[xx][yy]) neighbours++;
+            }
+            if (neighbours == 3 && isEmpty != 'undefined') {
+                newGeneration[x][y] = true;
+            } else if (neighbours < 2 || neighbours > 3) {
+                newGeneration[x][y] = false;
+            } else {
+                newGeneration[x][y] = cells[x][y];
+            }
+        }
+    }
+    cells = newGeneration;
+}
+
+function renderCells() {
+    canvasContext.fillStyle = cellColor;
+    for(var x = 0; x < cellsWidth; x++) {
+        for(var y = 0; y < cellsHeight; y++) {
+            if (cells[x][y]) {
+                canvasContext.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+            }
+        }
+    }
+}
+</script>
