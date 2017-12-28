@@ -59,7 +59,7 @@ function regenerate() {
                 if (yy >= cells[x].length) yy = yy % cells[x].length;
                 if (cells[xx][yy]) neighbours++;
             }
-            if (neighbours == 3 && isEmpty != 'undefined') {
+            if (isEmpty && neighbours == 3) {
                 newGeneration[x][y] = true;
             } else if (neighbours < 2 || neighbours > 3) {
                 newGeneration[x][y] = false;
